@@ -1,0 +1,53 @@
+{
+  "name": "agent-monitor-cli",
+  "version": "0.1.0",
+  "description": "CLI for the payment-x402 agent monitor — global stats, agent listings, detail, and wallet search.",
+  "keywords": [
+    "cli",
+    "monitor",
+    "agent",
+    "x402",
+    "payment",
+    "bun"
+  ],
+  "license": "MIT",
+  "author": "mini-shrimp",
+  "homepage": "https://github.com/your-org/agent-monitor-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/agent-monitor-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/agent-monitor-cli/issues"
+  },
+  "type": "module",
+  "main": "./dist/cli.js",
+  "bin": {
+    "monitor": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18",
+    "bun": ">=1.0"
+  },
+  "scripts": {
+    "dev": "bun run index.ts",
+    "start": "bun run index.ts",
+    "build": "bun build ./index.ts --outfile dist/cli.js --target node --minify --banner \"#!/usr/bin/env node\" && bun run build:chmod",
+    "build:chmod": "node -e \"try{require('fs').chmodSync('dist/cli.js',0o755)}catch(e){}\"",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prepack": "bun run clean && bun run build",
+    "prepublishOnly": "bun run clean && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "cli-table3": "^0.6.5",
+    "commander": "^14.0.3",
+    "picocolors": "^1.1.1",
+    "typescript": "^5"
+  }
+}
