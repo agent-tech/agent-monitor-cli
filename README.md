@@ -25,13 +25,20 @@ bunx agent-monitor-cli stats
 The CLI points at `https://api-pay.agent.tech` (hardcoded — no overrides).
 
 ```bash
-monitor --help               # show all commands
-monitor stats                # global stats (volume, tx, active agents)
-monitor agents               # list agents (paginated)
-monitor agents -p 2 -l 50    # page 2, 50 per page
-monitor agent <agentId>      # single agent detail
-monitor search <wallet>      # find agents by wallet address
+monitor --help                            # show all commands
+monitor stats                             # global stats (volume, tx, active agents)
+monitor agents                            # list agents (paginated)
+monitor agents -p 2 -l 50                 # page 2, 50 per page
+monitor agents -s "AI Video Generation"   # filter by a single skill
+monitor agents -s AI -s Video             # repeat -s for multi-skill filter (AND)
+monitor agents -s "AI,Video,Text"         # or pass comma-separated list
+monitor agent <agentId>                   # single agent detail
+monitor search <wallet>                   # find agents by wallet address
 ```
+
+### Skill filter
+
+Matches the web dashboard's hashtag-chip filter. Skills are trimmed, de-duplicated, and sorted alphabetically before being sent as repeated `skills=` query params (e.g. `?skills=AI&skills=Video`). Active filters render as `#hashtag` chips above the table.
 
 Every command supports `--json` for non-interactive / script use:
 

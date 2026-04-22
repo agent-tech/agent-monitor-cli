@@ -7,6 +7,16 @@ import type {
 
 const DEFAULT_TIMEOUT_MS = 45_000;
 
+/** Trim, drop empties, de-duplicate case-sensitively, sort alphabetically. Mirrors web client. */
+export function normalizeSkills(skills: readonly string[]): string[] {
+  const seen = new Set<string>();
+  for (const raw of skills) {
+    const t = raw.trim();
+    if (t) seen.add(t);
+  }
+  return [...seen].sort((a, b) => a.localeCompare(b));
+}
+
 export interface ApiClientOptions {
   baseUrl: string;
   timeoutMs?: number;
@@ -32,11 +42,17 @@ export class MonitorApi {
     this.timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 
-  private async request<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T> {
+  private async request<T>(
+    path: string,
+    params?: Record<string, string | number | string[] | undefined>,
+  ): Promise<T> {
     const url = new URL(this.baseUrl + path);
     if (params) {
       for (const [k, v] of Object.entries(params)) {
-        if (v !== undefined && v !== null && v !== '') {
+        if (v === undefined || v === null || v === '') continue;
+        if (Array.isArray(v)) {
+          for (const item of v) url.searchParams.append(k, String(item));
+        } else {
           url.searchParams.set(k, String(v));
         }
       }
@@ -74,11 +90,18 @@ export class MonitorApi {
     return this.request<GlobalStatsResponse>('/v1/monitor/global-stats');
   }
 
-  getAgents(page = 1, pageSize = 20): Promise<MonitorAgentsResponse> {
-    return this.request<MonitorAgentsResponse>('/v1/monitor/agents', {
+  getAgents(
+    page = 1,
+    pageSize = 20,
+    skills: readonly string[] = [],
+  ): Promise<MonitorAgentsResponse> {
+    const normalized = normalizeSkills(skills);
+    const params: Record<string, string | number | string[] | undefined> = {
       page,
       page_size: pageSize,
-    });
+    };
+    if (normalized.length) params.skills = normalized;
+    return this.request<MonitorAgentsResponse>('/v1/monitor/agents', params);
   }
 
   getAgent(agentId: string): Promise<MonitorAgentItem> {

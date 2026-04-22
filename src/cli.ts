@@ -53,19 +53,36 @@ export function buildProgram(): Command {
       await withErrorHandling(() => runStats(makeApi(), cmdOpts));
     });
 
+  const collectSkill = (value: string, previous: string[]): string[] => {
+    return [...previous, ...value.split(',').map((s) => s.trim()).filter(Boolean)];
+  };
+
   program
     .command('agents')
-    .description('List agents, paginated.')
+    .description('List agents, paginated. Filter by skill hashtag(s).')
     .option('-p, --page <n>', 'Page number (1-indexed)', parseInt10('--page', 1), 1)
     .option('-l, --limit <n>', 'Page size (1-100)', parseInt10('--limit', 1), 20)
+    .option(
+      '-s, --skill <skill>',
+      'Filter by skill; repeat or pass comma-separated list (e.g. -s "AI Video" -s Text-to-Video)',
+      collectSkill,
+      [] as string[],
+    )
     .option('--json', 'Emit raw API response as JSON')
-    .action(async (cmdOpts: { page: number; limit: number; json?: boolean }) => {
-      if (cmdOpts.limit > 100) {
-        process.stderr.write(cErr.yellow('Note: clamping --limit to 100.') + '\n');
-        cmdOpts.limit = 100;
-      }
-      await withErrorHandling(() => runAgents(makeApi(), cmdOpts));
-    });
+    .action(
+      async (cmdOpts: {
+        page: number;
+        limit: number;
+        skill: string[];
+        json?: boolean;
+      }) => {
+        if (cmdOpts.limit > 100) {
+          process.stderr.write(cErr.yellow('Note: clamping --limit to 100.') + '\n');
+          cmdOpts.limit = 100;
+        }
+        await withErrorHandling(() => runAgents(makeApi(), cmdOpts));
+      },
+    );
 
   program
     .command('agent <agentId>')

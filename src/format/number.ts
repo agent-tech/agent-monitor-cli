@@ -37,3 +37,9 @@ export function shortAddress(addr: string | undefined): string {
   if (addr.length <= 12) return addr;
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
+
+/** Matches web MonitorSearchFilters.skillFilterLabel — ensures a leading `#`. */
+export function skillHashtag(skill: string): string {
+  const t = skill.trim();
+  return t.startsWith('#') ? t : `#${t}`;
+}

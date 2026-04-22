@@ -1,5 +1,5 @@
 import Table from 'cli-table3';
-import type { MonitorApi } from '../api.ts';
+import { normalizeSkills, type MonitorApi } from '../api.ts';
 import type { MonitorAgentItem } from '../types.ts';
 import { c, trendColor } from '../format/color.ts';
 import {
@@ -8,12 +8,14 @@ import {
   formatRate,
   formatUsd,
   shortAddress,
+  skillHashtag,
   truncate,
 } from '../format/number.ts';
 
 export interface AgentsOptions {
   page: number;
   limit: number;
+  skill: string[];
   json?: boolean;
 }
 
@@ -26,11 +28,17 @@ function totalCount(a: MonitorAgentItem): number {
 }
 
 export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<void> {
-  const data = await api.getAgents(opts.page, opts.limit);
+  const skills = normalizeSkills(opts.skill);
+  const data = await api.getAgents(opts.page, opts.limit, skills);
 
   if (opts.json) {
     process.stdout.write(JSON.stringify(data, null, 2) + '\n');
     return;
+  }
+
+  if (skills.length) {
+    const chips = skills.map((s) => c.magenta(skillHashtag(s))).join(' ');
+    process.stdout.write(`${c.dim('Filters:')} ${chips}\n`);
   }
 
   const table = new Table({
@@ -43,6 +51,7 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
       c.bold('Tx'),
       c.bold('Repeat'),
       c.bold('7d'),
+      c.bold('Skills'),
     ],
     style: { head: [], border: [] },
     wordWrap: true,
@@ -50,6 +59,8 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
 
   for (const a of data.agents) {
     const trend = a.trend_7d_growth ?? 0;
+    const agentSkills = (a.skills ?? []).slice(0, 3).map(skillHashtag).join(' ');
+    const extra = (a.skills?.length ?? 0) > 3 ? ` +${(a.skills?.length ?? 0) - 3}` : '';
     table.push([
       String(a.ranking ?? ''),
       truncate(a.agent_name ?? a.agent_number, 24),
@@ -59,6 +70,7 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
       formatCount(totalCount(a)),
       formatRate((a.total_repeat_rate ?? 0) * 100),
       trendColor(trend)(formatPercent(trend)),
+      truncate((agentSkills + extra) || undefined, 40),
     ]);
   }
 
