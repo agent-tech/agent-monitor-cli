@@ -10,13 +10,13 @@
   ],
   "license": "MIT",
   "author": "mini-shrimp",
-  "homepage": "https://github.com/your-org/quay-cli#readme",
+  "homepage": "https://github.com/agent-tech/agent-monitor-cli#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/quay-cli.git"
+    "url": "git+https://github.com/agent-tech/agent-monitor-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/quay-cli/issues"
+    "url": "https://github.com/agent-tech/agent-monitor-cli/issues"
   },
   "publishConfig": {
     "access": "public"

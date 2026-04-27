@@ -30,5 +30,4 @@ npm publish --access public  # publish scoped package to npm (after bumping vers
 - [ ] Run `bun run build` and confirm `dist/cli.js` is fresh
 - [ ] `npm pack --dry-run` — verify tarball excludes `docs/`, `CONTRIBUTING.md`, dev-only files
 - [ ] `node dist/cli.js --help` smoke test
-- [ ] Update `repository`, `homepage`, `bugs`, `author` in `package.json` if they still point at placeholder URLs
 - [ ] `npm publish --access public`
