@@ -78,7 +78,7 @@ export function buildProgram(): Command {
     .option('-l, --limit <n>', 'Page size (1-100)', parseInt10('--limit', 1), 20)
     .option(
       '-s, --skill <skill>',
-      'Filter by skill; repeat or pass comma-separated list (e.g. -s "AI Video" -s Text-to-Video)',
+      'Filter by skill (max 3, repeat or comma-separated; e.g. -s "AI Video" -s Text-to-Video)',
       collectSkill,
       [] as string[],
     )

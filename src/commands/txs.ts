@@ -60,6 +60,14 @@ export async function runTxs(
     tx_hash: opts.tx,
   });
 
+  // When the user specified an explicit --tx filter and got nothing back, treat
+  // empty as a no-match signal (mirrors `quay search`'s grep-style exit). Without
+  // a filter, an empty list just means the agent has no txs yet — not a failure.
+  // Set this BEFORE any early return so --json mode also picks it up.
+  const filtered = !!opts.tx;
+  const empty = data.transactions.length === 0;
+  if (filtered && empty) process.exitCode = 1;
+
   if (opts.json) {
     process.stdout.write(JSON.stringify(data, null, 2) + '\n');
     return;
@@ -69,8 +77,11 @@ export async function runTxs(
     process.stdout.write(c.dim(`Filter: tx_hash=${opts.tx}`) + '\n');
   }
 
-  if (!data.transactions.length) {
-    process.stdout.write(c.yellow('No transactions.') + '\n');
+  if (empty) {
+    const msg = filtered
+      ? `No transactions matching tx_hash=${opts.tx}.`
+      : 'No transactions.';
+    process.stdout.write(c.yellow(msg) + '\n');
     return;
   }
 

@@ -83,6 +83,8 @@ quay agents --json
 
 Footer: `Page X (N shown) — use --page to load more.` Plus `— K claimable (★)` if any. The API's `total` field is a heuristic (≈ `page * page_size + 1`) rather than a real count, so the CLI doesn't print it; treat the `total` in `--json` as "more pages exist" rather than a true total.
 
+**Empty result with `-s` filter** → CLI prints `No agents matching <chips>.` and exits with code `1` (mirrors `quay search`). An empty page without `-s` (browsing past the end) exits `0`.
+
 ---
 
 ## `quay agent <agentId>`
@@ -208,6 +210,8 @@ quay txs 2e0fc6cd-... --json
 
 Footer: `Page X (N shown) — sorted by <sort> <order>.` (Like `quay agents`, `total` is treated as a heuristic and not displayed.)
 
+**Empty result with `--tx <hash>` filter** → CLI prints `No transactions matching tx_hash=<hash>.` and exits with code `1`. An empty list without `--tx` (agent has no txs) exits `0`.
+
 ---
 
 ## Exit codes
@@ -215,5 +219,5 @@ Footer: `Page X (N shown) — sorted by <sort> <order>.` (Like `quay agents`, `t
 | Code | Meaning |
 |------|---------|
 | `0` | Success |
-| `1` | API error (HTTP non-2xx, network error, timeout), invalid argument, or `quay search` returned no matches |
+| `1` | API error (HTTP non-2xx, network error, timeout), invalid argument, or a filtered command (`search`, `agents -s`, `txs --tx`) returned no matches |
 | `130` | Interrupted (`SIGINT` / Ctrl-C) |

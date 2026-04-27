@@ -46,6 +46,12 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
   }
   const data = await api.getAgents(opts.page, opts.limit, skills);
 
+  // Filter active + zero results = grep-style no-match exit. Set BEFORE any
+  // early return so `--json` mode picks it up too.
+  const filtered = skills.length > 0;
+  const empty = data.agents.length === 0;
+  if (filtered && empty) process.exitCode = 1;
+
   if (opts.json) {
     process.stdout.write(JSON.stringify(data, null, 2) + '\n');
     return;
@@ -54,6 +60,15 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
   if (skills.length) {
     const chips = skills.map((s) => c.magenta(skillHashtag(s))).join(' ');
     process.stdout.write(`${c.dim('Filters:')} ${chips}\n`);
+  }
+
+  if (empty) {
+    const chips = skills.map(skillHashtag).join(' ');
+    const msg = filtered
+      ? `No agents matching ${chips}.`
+      : 'No agents.';
+    process.stdout.write(c.yellow(msg) + '\n');
+    return;
   }
 
   const table = new Table({

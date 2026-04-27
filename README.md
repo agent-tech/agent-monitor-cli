@@ -63,7 +63,7 @@ Color is also auto-disabled when stdout is not a TTY (safe for pipes/CI).
 | Code | Meaning |
 |------|---------|
 | `0` | Success |
-| `1` | API error, invalid argument, or `search` returned no matches |
+| `1` | API error, invalid argument, or a filtered command (`search`, `agents -s`, `txs --tx`) returned no matches |
 | `130` | Interrupted (Ctrl-C) |
 
 `search` exits `1` on empty results so scripts can branch on it (mirrors `grep`). The agent listing endpoint returns a heuristic `total` (≈ `page * page_size + 1`) rather than a real count — the CLI hides it from the table footer; treat the `total` field in `--json` output as "more pages exist" rather than a true count.

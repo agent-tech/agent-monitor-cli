@@ -64,8 +64,19 @@ Not put through it (already absolute scores):
 | `total_repeat_rate` | `toChangePercent` → "Repeat" |
 | `trend_7d_growth` | `toChangePercent` → "7d" (colored) |
 | `skills[]` | First 3 as `#skill`, then `+N` for the remainder |
-| `total`, `page`, `page_size` | Pagination footer |
+| `page`, `page_size` | Pagination |
+| `total` | **Heuristic, not a real count.** See note below. |
 | `status`, `last_active_at`, `description`, `certs`, `agent_created_at`, `*_pr`, `*_repeat_count`, `*_total_count`, `payment_*_percent`, `facilitator`, `trend_history` | Not shown in list view, but visible via `--json` |
+
+> **About `total` (and the 858 vs 235k mystery)**
+>
+> The list endpoint returns `total ≈ min(page × page_size + 1, ~235k)` — a "more pages exist" pagination heuristic, capped at the all-time agent registry size. It is **not** the count of agents matching your query.
+>
+> You'll often see `quay stats` report `active_agents_count: ~858` while `quay agents --json | jq .total` reports `~235329`. They measure different things: stats counts agents with recent activity; the list endpoint's cap reflects the entire registry. Don't try to reconcile them.
+>
+> Treatment in the CLI:
+> - Table footer hides `total` entirely (just shows `Page X (N shown)`).
+> - `--json` mode preserves the raw field for shape compatibility, but **don't compute size or progress from it**. To page through, iterate until `agents` is empty.
 
 ---
 
@@ -116,8 +127,8 @@ The CLI errors out client-side if you pass more than one dimension, if `name` is
 
 | Top-level field | CLI behavior |
 |-----------------|--------------|
-| `agents[]` | Iterated in order |
-| `total` | Header line: `N of Total match(es)` |
+| `agents[]` | Iterated in order; empty result → exit code `1` |
+| `total` | Visible only via `--json`. The CLI's header just prints `N match(es)` from `agents.length`. |
 | `size` | Informational; visible only via `--json` |
 | `ranking` | Promoted onto the first matched agent before rendering (matches web) |
 
@@ -134,6 +145,10 @@ The CLI errors out client-side if you pass more than one dimension, if `name` is
 | `payer_chain` | "Chain" column, truncated to 14 chars |
 | `time` | "Time" column; ISO 8601 passthrough |
 | `status` | "Status" column; `Success`/`Failed`/`Pending` mapped case-insensitively (anything else → green like Success in web — CLI keeps raw) |
+| `page`, `page_size` | Pagination |
+| `total` | Same heuristic shape as `quay agents` (see note above). For agents with few transactions the value is truthful; for busy agents it follows `≈ page × page_size + 1`. CLI footer hides it; `--json` preserves it. |
+
+**Empty result with `--tx <hash>` filter** → exit code `1`. Without a filter, an empty list (agent has no txs yet) → exit `0`.
 
 **Status color map**
 
