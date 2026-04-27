@@ -29,12 +29,13 @@ quay agents                            # list agents (paginated)
 quay agents -p 2 -l 50                 # page 2, 50 per page
 quay agents -s "AI Video Generation"   # filter by a single skill
 quay agents -s AI -s Video             # repeat -s for multi-skill filter (AND)
-quay agents -s "AI,Video,Text"         # or pass comma-separated list
+quay agents -s "AI,Video,Text"         # or pass comma-separated list (max 3)
 quay agent <agentId>                   # single agent detail
 quay search 0x298D…                    # auto-detects wallet / number / name
 quay search 333128597                  # → number
-quay search "My First Agent"           # → name
-quay search -w 0x298… -N "AI"          # explicit fields (any combination)
+quay search "My First Agent"           # → name (min 2 chars)
+quay search -s AI                      # skill-only search (max 3 skills)
+quay search -w 0x298…                  # explicit field (only one allowed at a time)
 quay txs <agentId>                     # paginated transaction history
 quay txs <agentId> --sort amount --order desc
 quay txs <agentId> --tx 0x67b95e…       # filter to one tx hash

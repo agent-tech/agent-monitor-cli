@@ -1,6 +1,6 @@
 import Table from 'cli-table3';
 import { normalizeSkills, type MonitorApi } from '../api.ts';
-import type { MonitorAgentItem } from '../types.ts';
+import { SKILLS_MAX_COUNT, type MonitorAgentItem } from '../types.ts';
 import { c, trendColor } from '../format/color.ts';
 import {
   formatCount,
@@ -41,6 +41,9 @@ function nameCell(a: MonitorAgentItem): string {
 
 export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<void> {
   const skills = normalizeSkills(opts.skill);
+  if (skills.length > SKILLS_MAX_COUNT) {
+    throw new Error(`--skill supports at most ${SKILLS_MAX_COUNT} values (got ${skills.length}).`);
+  }
   const data = await api.getAgents(opts.page, opts.limit, skills);
 
   if (opts.json) {

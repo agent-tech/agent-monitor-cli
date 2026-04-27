@@ -99,7 +99,20 @@ Same shape as a list row plus the detail-only fields below.
 
 ## `quay search`
 
-Uses the same renderer as `quay agent` per result. Many fields may be absent in search rows — `agent_id`, `status`, `inbound_volume`, `outbound_volume`, `inbound_tx_count`, `outbound_tx_count` are all optional in this view. Missing values render as `—`.
+Search by exactly one dimension: wallet, agent number, name, or skill. Uses the same renderer as `quay agent` per result. Many fields may be absent in search rows — `agent_id`, `status`, `inbound_volume`, `outbound_volume`, `inbound_tx_count`, `outbound_tx_count` are all optional in this view. Missing values render as `—`.
+
+**Query dimensions** (mutually exclusive):
+
+| Dimension | Flag | CLI guard |
+|-----------|------|-----------|
+| wallet | `-w` / auto-detected from `0x{40hex}` | — |
+| agent number | `-n` / auto-detected from all-digits | — |
+| name | `-N` / auto-detected from anything else | min 2 chars |
+| skill | `-s` (repeat or comma-separated) | max 3 values |
+
+The CLI errors out client-side if you pass more than one dimension, if `name` is too short, or if `skill` count exceeds 3 — preventing a guaranteed 400 round-trip.
+
+**Response fields**:
 
 | Top-level field | CLI behavior |
 |-----------------|--------------|

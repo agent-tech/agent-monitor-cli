@@ -142,4 +142,9 @@ export interface MonitorAgentSearchParams {
   wallet?: string;
   number?: string;
   name?: string;
+  skills?: string[];
 }
+
+/** Server-enforced limits surfaced as CLI guards. */
+export const SEARCH_NAME_MIN_LENGTH = 2;
+export const SKILLS_MAX_COUNT = 3;

@@ -127,11 +127,14 @@ export class MonitorApi {
 
   /** Promote top-level `ranking` onto the first agent (matches web behaviour). */
   async searchAgents(query: MonitorAgentSearchParams): Promise<MonitorAgentSearchResponse> {
-    const params: Record<string, string | undefined> = {
+    const params: Record<string, string | string[] | undefined> = {
       wallet: query.wallet,
       number: query.number,
       name: query.name,
     };
+    if (query.skills?.length) {
+      params.skills = normalizeSkills(query.skills);
+    }
     const data = await this.request<MonitorAgentSearchResponse>(
       '/v1/monitor/agents/search',
       params,

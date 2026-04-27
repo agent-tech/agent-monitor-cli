@@ -109,11 +109,17 @@ export function buildProgram(): Command {
   program
     .command('search [query]')
     .description(
-      'Search agents. Auto-detects 0x… wallet, all-digits agent number, or free-text name. Use -w / -n / -N to be explicit.',
+      'Search agents by exactly one of: wallet / number / name / skill. Auto-detects 0x… wallet, all-digits number, or free-text name. Use -w / -n / -N / -s to be explicit.',
     )
     .option('-w, --wallet <addr>', 'Search by wallet address')
     .option('-n, --number <id>', 'Search by agent number')
-    .option('-N, --name <name>', 'Search by agent name')
+    .option('-N, --name <name>', 'Search by agent name (min 2 chars)')
+    .option(
+      '-s, --skill <skill>',
+      'Search by skill (max 3, repeat or comma-separated)',
+      collectSkill,
+      [] as string[],
+    )
     .option('--json', 'Emit raw API response as JSON')
     .action(
       async (
@@ -122,6 +128,7 @@ export function buildProgram(): Command {
           wallet?: string;
           number?: string;
           name?: string;
+          skill: string[];
           json?: boolean;
         },
       ) => {

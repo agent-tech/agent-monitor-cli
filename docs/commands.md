@@ -44,7 +44,7 @@ Paginated list of agents. Filter by skill hashtags.
 |------|-------|---------|-------|
 | `--page <n>` | `-p` | `1` | 1-indexed page number |
 | `--limit <n>` | `-l` | `20` | Page size (1–100; values >100 are clamped) |
-| `--skill <skill>` | `-s` | `[]` | Repeat or pass comma-separated. Trim/dedupe/sort applied client-side. |
+| `--skill <skill>` | `-s` | `[]` | Repeat or pass comma-separated. **Max 3 values.** Trim/dedupe/sort applied client-side. |
 | `--json` |  | off | Emit the raw API response |
 
 **Skill filter behavior** — matches the web hashtag-chip filter exactly:
@@ -53,6 +53,8 @@ Paginated list of agents. Filter by skill hashtags.
 2. De-duplicate (case-sensitive).
 3. Sort alphabetically (locale compare).
 4. Apply as an AND-filter (all selected skills must match).
+
+**Limits** — the API rejects more than 3 skill values. The CLI guards client-side and errors out with `--skill supports at most 3 values (got N).` Skill matching itself is case-insensitive on the server, so `AI` and `ai` behave the same.
 
 **Examples**
 
@@ -115,7 +117,9 @@ quay agent 2e0fc6cd-... --json | jq .skills
 
 ## `quay search [query]`
 
-Search by wallet / agent number / agent name. Auto-detects which based on the input string (matching web behavior):
+Search by **exactly one** of: wallet / agent number / agent name / skill.
+
+Auto-detects which field a free-form positional `[query]` belongs to:
 
 | Input pattern                | Treated as     |
 |------------------------------|----------------|
@@ -123,14 +127,28 @@ Search by wallet / agent number / agent name. Auto-detects which based on the in
 | `^\d+$`                       | agent number   |
 | anything else (non-empty)     | name           |
 
-To force a specific field, use the explicit flags (any combination — they're applied together):
+For skills (or to force a specific field), use the explicit flags:
 
-| Flag | Short | Field |
-|------|-------|-------|
-| `--wallet <addr>` | `-w` | wallet |
-| `--number <id>` | `-n` | agent number |
-| `--name <name>` | `-N` | name |
-| `--json` |  | Raw response |
+| Flag | Short | Field | Constraints |
+|------|-------|-------|-------------|
+| `--wallet <addr>` | `-w` | wallet | — |
+| `--number <id>` | `-n` | agent number | — |
+| `--name <name>` | `-N` | name | min 2 characters |
+| `--skill <skill>` | `-s` | skill | repeat or comma-separated, max 3 values |
+| `--json` |  | Raw response | — |
+
+**Mutual exclusion** — the API allows only one search dimension per request. If you pass more than one of `-w / -n / -N / -s`, the CLI rejects client-side:
+
+```
+Error: Only one of --wallet / --number / --name / --skill is allowed at a time (got: --wallet, --name).
+```
+
+**Validation** — the CLI mirrors the server's other constraints so you don't round-trip a 400:
+
+| Check | Message |
+|-------|---------|
+| `name` < 2 chars | `--name requires at least 2 characters.` |
+| more than 3 skills | `--skill supports at most 3 values (got N).` |
 
 **Examples**
 
@@ -138,13 +156,14 @@ To force a specific field, use the explicit flags (any combination — they're a
 quay search 0x298D89e95CC8Fefe940dbdB15E3d258ebf6D2668   # → wallet
 quay search 333128597                                     # → number
 quay search "My First Agent"                              # → name
-quay search -w 0x298... -n 333128597                      # explicit, both
+quay search -s AI                                         # skill-only
+quay search -s "AI,Video"                                 # multi-skill (max 3)
 quay search --json -N "agent" | jq '.agents | length'
 ```
 
 **Output**
 
-Prints `Search: <field>=<value>` then renders each match with the same layout as `quay agent`.
+Prints `Search: <field>=<value>` then renders each match with the same layout as `quay agent`. Skill searches show the active skills as `#hashtag` chips.
 
 **Ranking promotion** — when the API surfaces a top-level ranking, it's applied onto the first matched agent before rendering (matches web behavior).
 

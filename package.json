@@ -1,6 +1,6 @@
 {
   "name": "@agenttech/quay-cli",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Quay — terminal client for browsing agent activity (global stats, agent listings, detail, search, transactions).",
   "keywords": [
     "cli",
