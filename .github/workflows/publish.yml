@@ -30,7 +30,7 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Install packages
-        run: bun install --lockfile-only
+        run: bun install --frozen-lockfile
 
       - name: Build code
         run: bun run build
