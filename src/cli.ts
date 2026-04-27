@@ -41,8 +41,8 @@ export function buildProgram(): Command {
   const program = new Command();
 
   program
-    .name('monitor')
-    .description('Agent monitor CLI — inspect payment-x402 agents and global stats.')
+    .name('quay')
+    .description('Quay — agent monitor CLI for payment-x402 (global stats, agents, search).')
     .version('0.1.0');
 
   program

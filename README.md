@@ -1,23 +1,23 @@
-# agent-monitor-cli
+# @agenttch/quay-cli
 
-CLI view of the payment-x402 monitor module. Queries the same endpoints the web dashboard uses and renders them as tables.
+`quay` — CLI view of the payment-x402 monitor module. Queries the same endpoints the web dashboard uses and renders them as tables.
 
 ## Install
 
 ```bash
 # global install (runs on Node 18+ or Bun 1.0+)
-npm i -g agent-monitor-cli
+npm i -g @agenttch/quay-cli
 # or
-bun i -g agent-monitor-cli
+bun i -g @agenttch/quay-cli
 
-monitor --help
+quay --help
 ```
 
 One-off without installing:
 
 ```bash
-npx agent-monitor-cli stats
-bunx agent-monitor-cli stats
+npx @agenttch/quay-cli stats
+bunx @agenttch/quay-cli stats
 ```
 
 ## Commands
@@ -25,15 +25,15 @@ bunx agent-monitor-cli stats
 The CLI points at `https://api-pay.agent.tech` (hardcoded — no overrides).
 
 ```bash
-monitor --help                            # show all commands
-monitor stats                             # global stats (volume, tx, active agents)
-monitor agents                            # list agents (paginated)
-monitor agents -p 2 -l 50                 # page 2, 50 per page
-monitor agents -s "AI Video Generation"   # filter by a single skill
-monitor agents -s AI -s Video             # repeat -s for multi-skill filter (AND)
-monitor agents -s "AI,Video,Text"         # or pass comma-separated list
-monitor agent <agentId>                   # single agent detail
-monitor search <wallet>                   # find agents by wallet address
+quay --help                            # show all commands
+quay stats                             # global stats (volume, tx, active agents)
+quay agents                            # list agents (paginated)
+quay agents -p 2 -l 50                 # page 2, 50 per page
+quay agents -s "AI Video Generation"   # filter by a single skill
+quay agents -s AI -s Video             # repeat -s for multi-skill filter (AND)
+quay agents -s "AI,Video,Text"         # or pass comma-separated list
+quay agent <agentId>                   # single agent detail
+quay search <wallet>                   # find agents by wallet address
 ```
 
 ### Skill filter
@@ -43,7 +43,7 @@ Matches the web dashboard's hashtag-chip filter. Skills are trimmed, de-duplicat
 Every command supports `--json` for non-interactive / script use:
 
 ```bash
-monitor stats --json | jq .volume_7d_change
+quay stats --json | jq .volume_7d_change
 ```
 
 ## Endpoints Used
@@ -79,7 +79,7 @@ node dist/cli.js --help       # run built output
 
 ```bash
 npm pack --dry-run           # inspect tarball contents
-npm publish                   # publish to npm (after bumping version + logging in)
+npm publish --access public  # publish scoped package to npm (after bumping version + logging in)
 ```
 
-Before first publish, update the `name`, `repository`, `homepage`, `bugs`, and `author` fields in `package.json`.
+Before first publish, update the `repository`, `homepage`, `bugs`, and `author` fields in `package.json` to point at the real repo.
