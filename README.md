@@ -47,11 +47,7 @@ Full reference: [`docs/`](./docs) — see [`docs/commands.md`](./docs/commands.m
 
 Skills are trimmed, de-duplicated, and sorted alphabetically before filtering. Active filters render as `#hashtag` chips above the table.
 
-Every command supports `--json` for non-interactive / script use:
-
-```bash
-quay stats --json | jq .volume_7d_change
-```
+Every command supports `--json` for non-interactive / script use. See [`docs/output-format.md`](./docs/output-format.md).
 
 ## Environment
 

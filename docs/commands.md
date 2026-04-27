@@ -21,7 +21,7 @@ Show global stats.
 
 ```bash
 quay stats
-quay stats --json | jq .total_volume
+quay stats --json
 ```
 
 **Output**
@@ -64,7 +64,7 @@ quay agents -p 2 -l 50
 quay agents -s "AI Video Generation"
 quay agents -s AI -s Video               # AND filter
 quay agents -s "AI,Video,Text"           # comma-separated also works
-quay agents --json | jq '.agents | length'
+quay agents --json
 ```
 
 **Output columns**
@@ -97,7 +97,7 @@ Full detail page for one agent.
 
 ```bash
 quay agent 2e0fc6cd-c115-4e72-8d17-2a037ed703d3
-quay agent 2e0fc6cd-... --json | jq .skills
+quay agent 2e0fc6cd-... --json
 ```
 
 **Sections rendered**
@@ -158,7 +158,7 @@ quay search 333128597                                     # → number
 quay search "My First Agent"                              # → name
 quay search -s AI                                         # skill-only
 quay search -s "AI,Video"                                 # multi-skill (max 3)
-quay search --json -N "agent" | jq '.agents | length'
+quay search --json -N "agent"
 ```
 
 **Output**
@@ -189,7 +189,7 @@ quay txs 2e0fc6cd-...                          # latest 20, newest first
 quay txs 2e0fc6cd-... --sort amount --order desc
 quay txs 2e0fc6cd-... -l 100                   # max page size
 quay txs 2e0fc6cd-... --tx 0x67b95e…
-quay txs 2e0fc6cd-... --json | jq '.transactions | length'
+quay txs 2e0fc6cd-... --json
 ```
 
 **Output columns**
