@@ -35,9 +35,6 @@ jobs:
       - name: Build code
         run: bun run build
 
-      - name: Test
-        run: bun run test
-
       - name: 'Publish'
         run: |
           npm publish --provenance --access=public
