@@ -1,4 +1,4 @@
-# @agenttch/quay-cli
+# @agenttech/quay-cli
 
 `quay` — CLI view of the payment-x402 monitor module. Queries the same endpoints the web dashboard uses and renders them as tables.
 
@@ -6,9 +6,9 @@
 
 ```bash
 # global install (runs on Node 18+ or Bun 1.0+)
-npm i -g @agenttch/quay-cli
+npm i -g @agenttech/quay-cli
 # or
-bun i -g @agenttch/quay-cli
+bun i -g @agenttech/quay-cli
 
 quay --help
 ```
@@ -16,8 +16,8 @@ quay --help
 One-off without installing:
 
 ```bash
-npx @agenttch/quay-cli stats
-bunx @agenttch/quay-cli stats
+npx @agenttech/quay-cli stats
+bunx @agenttech/quay-cli stats
 ```
 
 ## Commands

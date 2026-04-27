@@ -1,5 +1,5 @@
 {
-  "name": "@agenttch/quay-cli",
+  "name": "@agenttech/quay-cli",
   "version": "0.1.0",
   "description": "Quay — CLI for the payment-x402 agent monitor (global stats, agent listings, detail, and wallet search).",
   "keywords": [
