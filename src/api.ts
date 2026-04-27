@@ -1,8 +1,11 @@
 import type {
   GlobalStatsResponse,
   MonitorAgentsResponse,
+  MonitorAgentDetailResponse,
   MonitorAgentSearchResponse,
-  MonitorAgentItem,
+  MonitorAgentSearchParams,
+  MonitorAgentTransactionsParams,
+  MonitorAgentTransactionsResponse,
 } from './types.ts';
 
 const DEFAULT_TIMEOUT_MS = 45_000;
@@ -15,6 +18,18 @@ export function normalizeSkills(skills: readonly string[]): string[] {
     if (t) seen.add(t);
   }
   return [...seen].sort((a, b) => a.localeCompare(b));
+}
+
+const WALLET_ADDRESS_PATTERN = /^0x[a-fA-F0-9]{40}$/;
+const AGENT_NUMBER_PATTERN = /^\d+$/;
+
+/** Smart-dispatch a free-form search string into wallet / number / name, mirroring web. */
+export function dispatchSearchQuery(raw: string): MonitorAgentSearchParams {
+  const trimmed = raw.trim();
+  if (!trimmed) return {};
+  if (WALLET_ADDRESS_PATTERN.test(trimmed)) return { wallet: trimmed };
+  if (AGENT_NUMBER_PATTERN.test(trimmed)) return { number: trimmed };
+  return { name: trimmed };
 }
 
 export interface ApiClientOptions {
@@ -104,11 +119,48 @@ export class MonitorApi {
     return this.request<MonitorAgentsResponse>('/v1/monitor/agents', params);
   }
 
-  getAgent(agentId: string): Promise<MonitorAgentItem> {
-    return this.request<MonitorAgentItem>(`/v1/monitor/agents/${encodeURIComponent(agentId)}`);
+  getAgent(agentId: string): Promise<MonitorAgentDetailResponse> {
+    return this.request<MonitorAgentDetailResponse>(
+      `/v1/monitor/agents/${encodeURIComponent(agentId)}`,
+    );
   }
 
-  searchAgents(wallet: string): Promise<MonitorAgentSearchResponse> {
-    return this.request<MonitorAgentSearchResponse>('/v1/monitor/agents/search', { wallet });
+  /** Promote top-level `ranking` onto the first agent (matches web behaviour). */
+  async searchAgents(query: MonitorAgentSearchParams): Promise<MonitorAgentSearchResponse> {
+    const params: Record<string, string | undefined> = {
+      wallet: query.wallet,
+      number: query.number,
+      name: query.name,
+    };
+    const data = await this.request<MonitorAgentSearchResponse>(
+      '/v1/monitor/agents/search',
+      params,
+    );
+    if (data.ranking != null && data.agents.length > 0) {
+      return {
+        ...data,
+        agents: [
+          { ...data.agents[0], ranking: data.ranking },
+          ...data.agents.slice(1),
+        ],
+      };
+    }
+    return data;
+  }
+
+  getAgentTransactions(
+    agentId: string,
+    params: MonitorAgentTransactionsParams = {},
+  ): Promise<MonitorAgentTransactionsResponse> {
+    return this.request<MonitorAgentTransactionsResponse>(
+      `/v1/monitor/agents/${encodeURIComponent(agentId)}/transactions`,
+      {
+        page: params.page ?? 1,
+        page_size: params.page_size ?? 20,
+        sort_by: params.sort_by ?? 'time',
+        sort_order: params.sort_order ?? 'desc',
+        tx_hash: params.tx_hash,
+      },
+    );
   }
 }

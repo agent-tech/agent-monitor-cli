@@ -1,7 +1,7 @@
 import Table from 'cli-table3';
 import type { MonitorApi } from '../api.ts';
 import { c, trendColor } from '../format/color.ts';
-import { formatCount, formatPercent, formatUsd } from '../format/number.ts';
+import { formatCount, formatPercent, formatUsd, toChangePercent } from '../format/number.ts';
 
 export interface StatsOptions {
   json?: boolean;
@@ -21,9 +21,9 @@ export async function runStats(api: MonitorApi, opts: StatsOptions): Promise<voi
   });
 
   const rows: Array<[string, string, number]> = [
-    ['Total Volume', formatUsd(data.total_volume), data.volume_7d_change],
-    ['Transactions', formatCount(data.total_transactions), data.transactions_7d_change],
-    ['Active Agents', formatCount(data.active_agents_count), data.active_agents_7d_change],
+    ['Total Volume', formatUsd(data.total_volume), toChangePercent(data.volume_7d_change)],
+    ['Transactions', formatCount(data.total_transactions), toChangePercent(data.transactions_7d_change)],
+    ['Active Agents', formatCount(data.active_agents_count), toChangePercent(data.active_agents_7d_change)],
   ];
 
   for (const [title, value, change] of rows) {

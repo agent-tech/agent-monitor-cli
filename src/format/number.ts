@@ -22,6 +22,16 @@ export function formatPercent(value: number | null | undefined, digits = 1): str
   return `${sign}${value.toFixed(digits)}%`;
 }
 
+/**
+ * Backend sometimes returns 7d / pr / percent fields as decimals (0.092)
+ * and sometimes as percentages (9.2). Mirrors web `toChangePercent`:
+ * |x| <= 1 → multiply by 100, otherwise leave untouched.
+ */
+export function toChangePercent(value: number | null | undefined): number {
+  if (value === null || value === undefined || Number.isNaN(value)) return 0;
+  return Math.abs(value) <= 1 ? value * 100 : value;
+}
+
 export function formatRate(value: number | null | undefined, digits = 2): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '—';
   return `${value.toFixed(digits)}%`;

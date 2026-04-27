@@ -9,6 +9,7 @@ import {
   formatUsd,
   shortAddress,
   skillHashtag,
+  toChangePercent,
   truncate,
 } from '../format/number.ts';
 
@@ -27,6 +28,17 @@ function totalCount(a: MonitorAgentItem): number {
   return (a.inbound_tx_count ?? 0) + (a.outbound_tx_count ?? 0);
 }
 
+function rankCell(a: MonitorAgentItem): string {
+  const r = a.ranking != null ? `#${a.ranking}` : '—';
+  return a.claimable ? `${r} ${c.yellow('★')}` : r;
+}
+
+function nameCell(a: MonitorAgentItem): string {
+  const name = truncate(a.agent_name ?? a.agent_number, 24);
+  if (!a.agent_number || a.agent_name === a.agent_number) return name;
+  return `${name}\n${c.dim(`#${a.agent_number}`)}`;
+}
+
 export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<void> {
   const skills = normalizeSkills(opts.skill);
   const data = await api.getAgents(opts.page, opts.limit, skills);
@@ -43,7 +55,7 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
 
   const table = new Table({
     head: [
-      c.bold('#'),
+      c.bold('Rank'),
       c.bold('Name'),
       c.bold('Wallet'),
       c.bold('Reputation'),
@@ -57,18 +69,20 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
     wordWrap: true,
   });
 
+  let claimableCount = 0;
   for (const a of data.agents) {
-    const trend = a.trend_7d_growth ?? 0;
+    if (a.claimable) claimableCount += 1;
+    const trend = toChangePercent(a.trend_7d_growth);
     const agentSkills = (a.skills ?? []).slice(0, 3).map(skillHashtag).join(' ');
     const extra = (a.skills?.length ?? 0) > 3 ? ` +${(a.skills?.length ?? 0) - 3}` : '';
     table.push([
-      String(a.ranking ?? ''),
-      truncate(a.agent_name ?? a.agent_number, 24),
+      rankCell(a),
+      nameCell(a),
       shortAddress(a.wallet_address),
       a.reputation ?? '—',
       formatUsd(totalVolume(a)),
       formatCount(totalCount(a)),
-      formatRate((a.total_repeat_rate ?? 0) * 100),
+      formatRate(toChangePercent(a.total_repeat_rate)),
       trendColor(trend)(formatPercent(trend)),
       truncate((agentSkills + extra) || undefined, 40),
     ]);
@@ -76,9 +90,14 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
 
   process.stdout.write(table.toString() + '\n');
   const loaded = (data.page - 1) * data.page_size + data.agents.length;
+  const claimableNote = claimableCount
+    ? c.yellow(` — ${claimableCount} claimable (★)`)
+    : '';
   process.stdout.write(
     c.dim(
       `Page ${data.page} (${data.agents.length} shown, ${loaded}/${data.total} total) — use --page to paginate.`,
-    ) + '\n',
+    ) +
+      claimableNote +
+      '\n',
   );
 }

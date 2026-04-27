@@ -1,14 +1,11 @@
 {
   "name": "@agenttech/quay-cli",
-  "version": "0.1.0",
-  "description": "Quay — CLI for the payment-x402 agent monitor (global stats, agent listings, detail, and wallet search).",
+  "version": "0.2.0",
+  "description": "Quay — terminal client for browsing agent activity (global stats, agent listings, detail, search, transactions).",
   "keywords": [
     "cli",
     "quay",
-    "monitor",
     "agent",
-    "x402",
-    "payment",
     "bun"
   ],
   "license": "MIT",
