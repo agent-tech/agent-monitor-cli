@@ -88,20 +88,23 @@ export async function runSearch(
   validate(dispatched);
 
   const data = await api.searchAgents(dispatched);
+  const empty = data.agents.length === 0;
 
   if (opts.json) {
     process.stdout.write(JSON.stringify(data, null, 2) + '\n');
+    if (empty) process.exitCode = 1;
     return;
   }
 
   process.stdout.write(c.dim(`Search: ${describeQuery(dispatched)}`) + '\n');
 
-  if (!data.agents.length) {
+  if (empty) {
     process.stdout.write(c.yellow(`No agents found.`) + '\n');
+    process.exitCode = 1;
     return;
   }
 
-  process.stdout.write(c.dim(`${data.agents.length} of ${data.total} match(es)`) + '\n');
+  process.stdout.write(c.dim(`${data.agents.length} match(es)`) + '\n');
   for (const agent of data.agents) {
     renderAgentDetail(agent);
   }

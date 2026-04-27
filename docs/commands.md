@@ -81,7 +81,7 @@ quay agents --json
 | 7d | `trend_7d_growth` (via `toChangePercent`) | Green/red/gray |
 | Skills | First 3 of `skills[]` as `#skill`, plus `+N` for the rest | Truncated to 40 chars |
 
-Footer: `Page X (N shown, M/Total) — use --page to paginate.` Plus `— K claimable (★)` if any.
+Footer: `Page X (N shown) — use --page to load more.` Plus `— K claimable (★)` if any. The API's `total` field is a heuristic (≈ `page * page_size + 1`) rather than a real count, so the CLI doesn't print it; treat the `total` in `--json` as "more pages exist" rather than a true total.
 
 ---
 
@@ -165,6 +165,8 @@ quay search --json -N "agent"
 
 Prints `Search: <field>=<value>` then renders each match with the same layout as `quay agent`. Skill searches show the active skills as `#hashtag` chips.
 
+**Empty result → exit 1** — when the search returns no matches, `quay search` writes `No agents found.` and exits with code `1` (mirrors `grep`'s no-match convention) so scripts can branch. `--json` mode still emits a valid empty `agents: []` body before exiting `1`.
+
 **Ranking promotion** — when the API surfaces a top-level ranking, it's applied onto the first matched agent before rendering (matches web behavior).
 
 ---
@@ -204,7 +206,7 @@ quay txs 2e0fc6cd-... --json
 | Time | `time` | ISO 8601 from API (no reformatting) |
 | Status | `status` | `Success` (green) / `Failed` (red) / `Pending` (yellow) |
 
-Footer: `Page X (N shown, M/Total) — sorted by <sort> <order>.`
+Footer: `Page X (N shown) — sorted by <sort> <order>.` (Like `quay agents`, `total` is treated as a heuristic and not displayed.)
 
 ---
 
@@ -213,5 +215,5 @@ Footer: `Page X (N shown, M/Total) — sorted by <sort> <order>.`
 | Code | Meaning |
 |------|---------|
 | `0` | Success |
-| `1` | API error (HTTP non-2xx, network error, timeout) or invalid argument |
+| `1` | API error (HTTP non-2xx, network error, timeout), invalid argument, or `quay search` returned no matches |
 | `130` | Interrupted (`SIGINT` / Ctrl-C) |

@@ -92,13 +92,14 @@ export async function runAgents(api: MonitorApi, opts: AgentsOptions): Promise<v
   }
 
   process.stdout.write(table.toString() + '\n');
-  const loaded = (data.page - 1) * data.page_size + data.agents.length;
   const claimableNote = claimableCount
     ? c.yellow(` — ${claimableCount} claimable (★)`)
     : '';
+  // The API's `total` field is a fake "next-page-exists" signal (≈ page*page_size+1),
+  // so we deliberately don't print it here. Use --page to load more.
   process.stdout.write(
     c.dim(
-      `Page ${data.page} (${data.agents.length} shown, ${loaded}/${data.total} total) — use --page to paginate.`,
+      `Page ${data.page} (${data.agents.length} shown) — use --page to load more.`,
     ) +
       claimableNote +
       '\n',

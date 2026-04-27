@@ -41,13 +41,13 @@ quay txs <agentId> --sort amount --order desc
 quay txs <agentId> --tx 0x67b95e…       # filter to one tx hash
 ```
 
-Full reference: [`docs/`](./docs) — see [`docs/commands.md`](./docs/commands.md), [`docs/fields.md`](./docs/fields.md), [`docs/output-format.md`](./docs/output-format.md).
+Full reference: [`docs/`](https://github.com/agent-tech/agent-monitor-cli/tree/main/docs) — see [`commands.md`](https://github.com/agent-tech/agent-monitor-cli/blob/main/docs/commands.md), [`fields.md`](https://github.com/agent-tech/agent-monitor-cli/blob/main/docs/fields.md), [`output-format.md`](https://github.com/agent-tech/agent-monitor-cli/blob/main/docs/output-format.md).
 
 ### Skill filter
 
 Skills are trimmed, de-duplicated, and sorted alphabetically before filtering. Active filters render as `#hashtag` chips above the table.
 
-Every command supports `--json` for non-interactive / script use. See [`docs/output-format.md`](./docs/output-format.md).
+Every command supports `--json` for non-interactive / script use. See [`output-format.md`](https://github.com/agent-tech/agent-monitor-cli/blob/main/docs/output-format.md).
 
 ## Environment
 
@@ -58,8 +58,18 @@ Every command supports `--json` for non-interactive / script use. See [`docs/out
 
 Color is also auto-disabled when stdout is not a TTY (safe for pipes/CI).
 
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | API error, invalid argument, or `search` returned no matches |
+| `130` | Interrupted (Ctrl-C) |
+
+`search` exits `1` on empty results so scripts can branch on it (mirrors `grep`). The agent listing endpoint returns a heuristic `total` (≈ `page * page_size + 1`) rather than a real count — the CLI hides it from the table footer; treat the `total` field in `--json` output as "more pages exist" rather than a true count.
+
 ## License
 
-MIT — see [`LICENSE`](./LICENSE).
+MIT — see [`LICENSE`](https://github.com/agent-tech/agent-monitor-cli/blob/main/LICENSE).
 
-Contributors: see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+Contributors: see [`CONTRIBUTING.md`](https://github.com/agent-tech/agent-monitor-cli/blob/main/CONTRIBUTING.md).

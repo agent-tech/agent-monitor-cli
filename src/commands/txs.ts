@@ -92,10 +92,11 @@ export async function runTxs(
 
   process.stdout.write(table.toString() + '\n');
 
-  const loaded = (data.page - 1) * data.page_size + data.transactions.length;
+  // `total` from the API can be a heuristic ("there's one more page") rather than
+  // a real count, so we don't surface it. Use --page to load more.
   process.stdout.write(
     c.dim(
-      `Page ${data.page} (${data.transactions.length} shown, ${loaded}/${data.total} total) — sorted by ${opts.sort} ${opts.order}.`,
+      `Page ${data.page} (${data.transactions.length} shown) — sorted by ${opts.sort} ${opts.order}.`,
     ) + '\n',
   );
 }
